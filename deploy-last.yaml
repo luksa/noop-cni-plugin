@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: noop-last
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: noop-last
+  template:
+    metadata:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[ { "name": "ipvlan-test-project", "ips": ["192.168.2.16/24"], "default-route": ["192.168.2.10"] }, {"name": "noop-cni-plugin"} ]'
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: noop-last
+    spec:
+      nodeSelector:
+        cnitest: 'true'
+      containers:
+      - command:
+        - /sbin/init
+        image: centos:latest
+        imagePullPolicy: IfNotPresent
+        name: ipvlan-pod-1
+      restartPolicy: Always
